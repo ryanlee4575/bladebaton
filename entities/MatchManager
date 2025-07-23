@@ -1,0 +1,38 @@
+// entities/Match/MatchManager.ts
+
+import { MatchSimulator } from './MatchSimulator';
+import { TeamStats } from '../TeamStats/TeamStats';
+import { Match } from './Match'; // your schema
+
+export function runDualMeet(
+  home: TeamStats,
+  away: TeamStats,
+  gender: 'mens_roster' | 'womens_roster',
+  date: string,
+  opponentName: string
+): Match {
+  const sim = MatchSimulator.simulateDualMeet(home, away, gender);
+
+  return {
+    opponent: opponentName,
+    date,
+    type: 'dual_meet',
+    venue: 'home',
+    status: 'completed',
+    results: {
+      foil_score: countWeaponScore(sim.bouts, 'foil'),
+      epee_score: countWeaponScore(sim.bouts, 'epee'),
+      sabre_score: countWeaponScore(sim.bouts, 'sabre'),
+      overall_result: sim.winner,
+      final_score: sim.score
+    },
+    bouts: sim.bouts
+  };
+}
+
+function countWeaponScore(bouts, weapon) {
+  const weaponBouts = bouts.filter(b => b.weapon === weapon);
+  const homeWins = weaponBouts.filter(b => b.winner === 'home').length;
+  const awayWins = weaponBouts.length - homeWins;
+  return `${homeWins}-${awayWins}`;
+}
