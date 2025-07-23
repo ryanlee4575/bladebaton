@@ -26,6 +26,7 @@
       "type": "number",
       "default": 0
     },
+    
     "facilities": {
       "type": "object",
       "properties": {
@@ -46,6 +47,7 @@
         }
       }
     },
+    
     "staff": {
       "type": "object",
       "properties": {
@@ -64,10 +66,52 @@
           "type": "number"
         }
       }
+    },
+
+    "mens_roster": {
+      "type": "object",
+      "properties": {
+        "foil": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        },
+        "epee": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        },
+        "sabre": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        }
+      },
+      "description": "Men's team roster sorted by weapon"
+    },
+
+    "womens_roster": {
+      "type": "object",
+      "properties": {
+        "foil": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        },
+        "epee": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        },
+        "sabre": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Fencer" }
+        }
+      },
+      "description": "Women's team roster sorted by weapon"
     }
   },
+
   "required": [
     "season_year",
-    "budget"
+    "budget",
+    "mens_roster",
+    "womens_roster"
   ]
 }
+
