@@ -1,0 +1,97 @@
+import { Fencer } from '../Fencer/Fencer';
+import { TeamStats } from '../TeamStats/TeamStats';
+
+type BoutResult = {
+  weapon: 'foil' | 'epee' | 'sabre';
+  fencerHome: Fencer;
+  fencerAway: Fencer;
+  winner: 'home' | 'away';
+  margin: number; // for spicy detail
+};
+
+export class MatchSimulator {
+  static simulateDualMeet(
+    home: TeamStats,
+    away: TeamStats,
+    gender: 'mens_roster' | 'womens_roster'
+  ): { score: string; bouts: BoutResult[]; winner: 'home' | 'away' } {
+    const weapons: ('foil' | 'epee' | 'sabre')[] = ['foil', 'epee', 'sabre'];
+    let homeScore = 0;
+    let awayScore = 0;
+    const bouts: BoutResult[] = [];
+
+    for (const weapon of weapons) {
+      const homeFencers = home[gender][weapon];
+      const awayFencers = away[gender][weapon];
+
+      for (const hf of homeFencers) {
+        for (const af of awayFencers) {
+          const result = this.simulateBout(hf, af, weapon);
+          bouts.push(result);
+          if (result.winner === 'home') homeScore++;
+          else awayScore++;
+
+          // Optional early win check
+          if (homeScore >= 14 || awayScore >= 14) break;
+        }
+        if (homeScore >= 14 || awayScore >= 14) break;
+      }
+      if (homeScore >= 14 || awayScore >= 14) break;
+    }
+
+    return {
+      score: `${homeScore} - ${awayScore}`,
+      bouts,
+      winner: homeScore > awayScore ? 'home' : 'away'
+    };
+  }
+
+  static simulateBout(f1: Fencer, f2: Fencer, weapon: string): BoutResult {
+    const perf1 = this.calculatePerformance(f1, f2);
+    const perf2 = this.calculatePerformance(f2, f1);
+
+    const winner = perf1 > perf2 ? 'home' : 'away';
+    const margin = Math.abs(perf1 - perf2);
+
+    return {
+      weapon: weapon as any,
+      fencerHome: f1,
+      fencerAway: f2,
+      winner,
+      margin
+    };
+  }
+
+  static calculatePerformance(fencer: Fencer, opponent: Fencer): number {
+    let base =
+      fencer.stats.technique * 0.3 +
+      fencer.stats.tactical_awareness * 0.25 +
+      fencer.stats.speed * 0.15 +
+      fencer.stats.endurance * 0.15 +
+      fencer.stats.mental_focus * 0.15;
+
+    // Fatigue penalty (ouch)
+    base *= 1 - fencer.fatigue_level / 200;
+
+    // Morale bonus (confidence OP)
+    base *= 1 + (fencer.morale - 50) / 200;
+
+    // Trait bonuses (small but spicy)
+    switch (fencer.personality) {
+      case 'clutch_performer':
+        if (Math.random() < 0.1) base *= 1.1;
+        break;
+      case 'aggressive':
+        base *= 1.05;
+        break;
+      case 'defensive':
+        if (opponent.personality === 'aggressive') base *= 1.1;
+        break;
+      case 'emotional':
+        base *= Math.random() * 0.2 + 0.9; // unpredictable!
+        break;
+    }
+
+    return base + Math.random() * 5; // touch of randomness
+  }
+}
