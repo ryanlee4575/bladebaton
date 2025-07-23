@@ -55,6 +55,19 @@
         }
       }
     },
+    "bouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "weapon": { "type": "string", "enum": ["foil", "epee", "sabre"] },
+          "fencerHome": { "type": "string" },
+          "fencerAway": { "type": "string" },
+          "winner": { "type": "string", "enum": ["home", "away"] },
+          "margin": { "type": "number" }
+        }
+      }
+    },
     "status": {
       "type": "string",
       "enum": [
