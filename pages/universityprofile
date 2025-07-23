@@ -1,0 +1,149 @@
+import React, { useState, useEffect } from "react";
+import { University } from "@/entities/University";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building, Shield, Star, Save } from "lucide-react";
+
+export default function UniversityProfile() {
+  const [university, setUniversity] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    loadUniversity();
+  }, []);
+
+  const loadUniversity = async () => {
+    setIsLoading(true);
+    const data = await University.list('', 1);
+    if (data.length > 0) {
+      setUniversity(data[0]);
+    }
+    setIsLoading(false);
+  };
+
+  const handleInputChange = (field, value) => {
+    setUniversity(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveChanges = async () => {
+    if (!university) return;
+    setIsSaving(true);
+    await University.update(university.id, university);
+    setIsSaving(false);
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading University Profile...</div>;
+  }
+  
+  if (!university) {
+     return <div className="p-8 text-center">No University data found. Please initialize your program.</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-4 bg-white rounded-2xl shadow-lg border">
+             <Building className="w-10 h-10 text-amber-600" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-1">University Profile</h1>
+            <p className="text-slate-600 text-lg">Define your program's identity and prestige.</p>
+          </div>
+        </div>
+
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-slate-800">{university.name}</CardTitle>
+            <p className="text-slate-500">"{university.nickname}"</p>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Editable Fields */}
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="uniName" className="font-semibold text-slate-700">University Name</Label>
+                <Input 
+                  id="uniName" 
+                  value={university.name} 
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="nickname" className="font-semibold text-slate-700">Nickname</Label>
+                <Input 
+                  id="nickname" 
+                  value={university.nickname} 
+                  onChange={(e) => handleInputChange('nickname', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="location" className="font-semibold text-slate-700">Location</Label>
+                <Input 
+                  id="location" 
+                  value={university.location} 
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            {/* Selectable Fields & Display */}
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="athleticFocus" className="font-semibold text-slate-700">Athletic Focus</Label>
+                <Select value={university.athletic_focus} onValueChange={(val) => handleInputChange('athletic_focus', val)}>
+                  <SelectTrigger id="athleticFocus" className="mt-1">
+                    <SelectValue placeholder="Select focus..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Championship Contender">Championship Contender</SelectItem>
+                    <SelectItem value="Academic Priority">Academic Priority</SelectItem>
+                    <SelectItem value="Balanced Program">Balanced Program</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="academicFocus" className="font-semibold text-slate-700">Academic Focus</Label>
+                <Select value={university.academic_focus} onValueChange={(val) => handleInputChange('academic_focus', val)}>
+                  <SelectTrigger id="academicFocus" className="mt-1">
+                    <SelectValue placeholder="Select focus..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="STEM">STEM</SelectItem>
+                    <SelectItem value="Liberal Arts">Liberal Arts</SelectItem>
+                    <SelectItem value="Balanced">Balanced</SelectItem>
+                    <SelectItem value="Fine Arts">Fine Arts</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg">
+                <Label className="font-semibold text-slate-700">Prestige</Label>
+                <div className="flex items-center gap-3 mt-2">
+                  <Star className="w-6 h-6 text-amber-500"/>
+                  <div className="w-full bg-slate-200 rounded-full h-2.5">
+                    <div className="bg-amber-500 h-2.5 rounded-full" style={{width: `${university.prestige}%`}}></div>
+                  </div>
+                  <span className="font-bold text-lg text-slate-800">{university.prestige}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          <div className="p-6 border-t border-slate-100 flex justify-end">
+            <Button onClick={handleSaveChanges} disabled={isSaving} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-lg">
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
