@@ -1,0 +1,66 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Users, TrendingUp, Calendar } from "lucide-react";
+
+export default function QuickStats({ teamStats, fencers, upcomingMatches }) {
+  const totalRecord = `${teamStats?.wins || 0}-${teamStats?.losses || 0}`;
+  const budgetRemaining = ((teamStats?.budget || 0) - (teamStats?.budget_used || 0)) / 1000;
+  
+  const statsCards = [
+    {
+      title: "Season Record",
+      value: totalRecord,
+      icon: Trophy,
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-700"
+    },
+    {
+      title: "Active Fencers",
+      value: fencers?.length || 0,
+      icon: Users,
+      color: "from-blue-500 to-blue-600", 
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-700"
+    },
+    {
+      title: "Budget Remaining",
+      value: `$${budgetRemaining.toFixed(0)}K`,
+      icon: TrendingUp,
+      color: "from-amber-500 to-amber-600",
+      bgColor: "bg-amber-50", 
+      textColor: "text-amber-700"
+    },
+    {
+      title: "Next Match",
+      value: upcomingMatches > 0 ? `${upcomingMatches} days` : "None scheduled",
+      icon: Calendar,
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-700"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {statsCards.map((stat) => (
+        <Card key={stat.title} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${stat.color} opacity-10 rounded-full transform translate-x-6 -translate-y-6 group-hover:scale-110 transition-transform duration-300`} />
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600">{stat.title}</p>
+                <CardTitle className="text-2xl font-bold text-slate-900 mt-1">
+                  {stat.value}
+                </CardTitle>
+              </div>
+              <div className={`p-3 rounded-xl ${stat.bgColor} group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      ))}
+    </div>
+  );
+}
