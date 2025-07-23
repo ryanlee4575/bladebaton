@@ -1,0 +1,148 @@
+import React, { useState, useEffect } from "react";
+import { Coach } from "@/entities/Coach";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Award, BrainCircuit, BarChart, Save } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+
+export default function CoachProfile() {
+  const [coach, setCoach] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    loadCoach();
+  }, []);
+
+  const loadCoach = async () => {
+    setIsLoading(true);
+    const data = await Coach.list('', 1);
+    if (data.length > 0) {
+      setCoach(data[0]);
+    }
+    setIsLoading(false);
+  };
+  
+  const handleInputChange = (field, value) => {
+    setCoach(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveChanges = async () => {
+    if (!coach) return;
+    setIsSaving(true);
+    await Coach.update(coach.id, coach);
+    setIsSaving(false);
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading Coach Profile...</div>;
+  }
+  
+  if (!coach) {
+     return <div className="p-8 text-center">No Coach data found. Please initialize your profile.</div>;
+  }
+  
+  const xpPercentage = (coach.xp_current / coach.xp_needed) * 100;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-4 bg-white rounded-2xl shadow-lg border">
+             <User className="w-10 h-10 text-amber-600" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-1">Coach Profile</h1>
+            <p className="text-slate-600 text-lg">Develop your skills and coaching philosophy.</p>
+          </div>
+        </div>
+
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="border-b border-slate-100">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-2xl font-bold text-slate-800">{coach.name}</CardTitle>
+                <p className="text-slate-500">{coach.experience_years} years experience</p>
+              </div>
+              <div className="text-right">
+                <span className="font-bold text-lg text-amber-600">Level {coach.level}</span>
+                <p className="text-xs text-slate-500">Next Level: {coach.xp_current}/{coach.xp_needed} XP</p>
+              </div>
+            </div>
+            <Progress value={xpPercentage} className="w-full mt-2 h-3 bg-slate-200 [&>div]:bg-amber-500" />
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="coachName" className="font-semibold text-slate-700">Coach Name</Label>
+                <Input 
+                  id="coachName" 
+                  value={coach.name} 
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="philosophy" className="font-semibold text-slate-700">Coaching Philosophy</Label>
+                <Select value={coach.philosophy} onValueChange={(val) => handleInputChange('philosophy', val)}>
+                  <SelectTrigger id="philosophy" className="mt-1">
+                    <SelectValue placeholder="Select philosophy..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Developmental">Developmental</SelectItem>
+                    <SelectItem value="Recruiting-Heavy">Recruiting-Heavy</SelectItem>
+                    <SelectItem value="Tactical-Master">Tactical-Master</SelectItem>
+                    <SelectItem value="Balanced">Balanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="specialty" className="font-semibold text-slate-700">Specialty</Label>
+                <Select value={coach.specialty} onValueChange={(val) => handleInputChange('specialty', val)}>
+                  <SelectTrigger id="specialty" className="mt-1">
+                    <SelectValue placeholder="Select specialty..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Recruiting">Recruiting</SelectItem>
+                    <SelectItem value="Talent Development">Talent Development</SelectItem>
+                    <SelectItem value="In-Match Tactics">In-Match Tactics</SelectItem>
+                    <SelectItem value="Conditioning">Conditioning</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {/* Skill Tree/Bonuses */}
+            <div className="bg-slate-50 p-6 rounded-lg">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">Coaching Bonuses</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-slate-700">
+                  <Award className="w-5 h-5 text-amber-500"/>
+                  <p><span className="font-semibold">{coach.philosophy}</span>: +5% Morale gain</p>
+                </div>
+                <div className="flex items-center gap-3 text-slate-700">
+                  <BrainCircuit className="w-5 h-5 text-blue-500"/>
+                  <p><span className="font-semibold">{coach.specialty}</span>: +10% training efficiency in {coach.specialty}</p>
+                </div>
+                 <div className="flex items-center gap-3 text-slate-700">
+                  <BarChart className="w-5 h-5 text-emerald-500"/>
+                  <p><span className="font-semibold">Level {coach.level}</span>: Unlocks advanced scouting reports</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          <div className="p-6 border-t border-slate-100 flex justify-end">
+            <Button onClick={handleSaveChanges} disabled={isSaving} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-lg">
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
