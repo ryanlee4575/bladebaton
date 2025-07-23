@@ -1,0 +1,524 @@
+
+import React, { useState } from "react";
+import { University, Coach, TeamStats } from "@/entities/all";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sword, Building, User, Trophy, ArrowRight, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+const presetUniversities = [
+  {
+    name: "Harvard University",
+    nickname: "Crimson",
+    location: "Cambridge, MA",
+    prestige: 98,
+    academic_focus: "Liberal Arts",
+    athletic_focus: "Academic Priority",
+    primary_color: "#A51C30",
+    secondary_color: "#FFFFFF"
+  },
+  {
+    name: "Stanford University", 
+    nickname: "Cardinal",
+    location: "Stanford, CA",
+    prestige: 96,
+    academic_focus: "STEM",
+    athletic_focus: "Championship Contender",
+    primary_color: "#8C1515",
+    secondary_color: "#DAA900"
+  },
+  {
+    name: "Princeton University",
+    nickname: "Tigers",
+    location: "Princeton, NJ",
+    prestige: 97,
+    academic_focus: "Liberal Arts",
+    athletic_focus: "Academic Priority",
+    primary_color: "#FF8F00",
+    secondary_color: "#000000"
+  },
+  {
+    name: "Columbia University",
+    nickname: "Lions",
+    location: "New York, NY", 
+    prestige: 95,
+    academic_focus: "Liberal Arts",
+    athletic_focus: "Balanced Program",
+    primary_color: "#B9D9EB",
+    secondary_color: "#FFFFFF"
+  },
+  {
+    name: "Duke University",
+    nickname: "Blue Devils", 
+    location: "Durham, NC",
+    prestige: 92,
+    academic_focus: "Balanced",
+    athletic_focus: "Championship Contender",
+    primary_color: "#003087",
+    secondary_color: "#FFFFFF"
+  },
+  {
+    name: "Notre Dame",
+    nickname: "Fighting Irish",
+    location: "Notre Dame, IN",
+    prestige: 90,
+    academic_focus: "Balanced", 
+    athletic_focus: "Championship Contender",
+    primary_color: "#0C2340",
+    secondary_color: "#AE9142"
+  },
+  {
+    name: "Ohio State University",
+    nickname: "Buckeyes",
+    location: "Columbus, OH",
+    prestige: 88,
+    academic_focus: "Balanced",
+    athletic_focus: "Championship Contender",
+    primary_color: "#BB0000",
+    secondary_color: "#666666"
+  },
+  {
+    name: "Penn State University",
+    nickname: "Nittany Lions",
+    location: "State College, PA",
+    prestige: 86,
+    academic_focus: "Balanced",
+    athletic_focus: "Championship Contender",
+    primary_color: "#041E42",
+    secondary_color: "#FFFFFF"
+  },
+  {
+    name: "Northwestern University",
+    nickname: "Wildcats",
+    location: "Evanston, IL",
+    prestige: 84,
+    academic_focus: "STEM",
+    athletic_focus: "Academic Priority", 
+    primary_color: "#4E2A84",
+    secondary_color: "#FFFFFF"
+  },
+  {
+    name: "UC San Diego",
+    nickname: "Tritons",
+    location: "La Jolla, CA",
+    prestige: 82,
+    academic_focus: "STEM",
+    athletic_focus: "Balanced Program",
+    primary_color: "#006A96",
+    secondary_color: "#FFCD00"
+  },
+  {
+    name: "St. John's University",
+    nickname: "Red Storm",
+    location: "Queens, NY",
+    prestige: 78,
+    academic_focus: "Liberal Arts",
+    athletic_focus: "Balanced Program",
+    primary_color: "#BA0C2F",
+    secondary_color: "#041C2C"
+  },
+  {
+    name: "Boston College",
+    nickname: "Eagles",
+    location: "Chestnut Hill, MA",
+    prestige: 80,
+    academic_focus: "Balanced",
+    athletic_focus: "Balanced Program",
+    primary_color: "#8C2232",
+    secondary_color: "#B5A36A"
+  }
+];
+
+export default function Setup() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const [customUniversity, setCustomUniversity] = useState({
+    name: "",
+    nickname: "",
+    location: "",
+    prestige: 75,
+    academic_focus: "Balanced",
+    athletic_focus: "Championship Contender"
+  });
+  const [coachData, setCoachData] = useState({
+    name: "",
+    philosophy: "Balanced",
+    specialty: "Talent Development"
+  });
+  const [isCreating, setIsCreating] = useState(false);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+
+  const handleUniversitySelect = (university) => {
+    setSelectedUniversity(university);
+    setShowCustomForm(false);
+  };
+
+  const handleCustomUniversityChange = (field, value) => {
+    setCustomUniversity(prev => ({ ...prev, [field]: value }));
+    setSelectedUniversity(null);
+  };
+
+  const handleCoachChange = (field, value) => {
+    setCoachData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const createProgram = async () => {
+    setIsCreating(true);
+    
+    try {
+      // Create University
+      const universityToCreate = selectedUniversity || customUniversity;
+      const university = await University.create(universityToCreate);
+      
+      // Create Coach
+      const coach = await Coach.create({
+        ...coachData,
+        experience_years: 0,
+        level: 1,
+        xp_current: 0,
+        xp_needed: 100
+      });
+
+      // Create initial TeamStats
+      await TeamStats.create({
+        season_year: "2024-25",
+        budget: 500000,
+        budget_used: 0,
+        team_ranking: 50,
+        wins: 0,
+        losses: 0,
+        facilities: {
+          training_room_level: 2,
+          recovery_center_level: 1,
+          dorms_level: 2
+        },
+        staff: {
+          head_coach_rating: 5,
+          assistant_coaches: 1,
+          trainers: 1,
+          analysts: 0
+        }
+      });
+
+      // Navigate to Dashboard
+      navigate(createPageUrl("Dashboard"));
+    } catch (error) {
+      console.error("Error creating program:", error);
+    }
+    
+    setIsCreating(false);
+  };
+
+  const isCustomUniversityValid = customUniversity.name && customUniversity.nickname;
+  const canProceed = selectedUniversity || (showCustomForm && isCustomUniversityValid);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl shadow-xl">
+              <Sword className="w-12 h-12 text-white" />
+            </div>
+            <div>
+              <h1 className="text-5xl font-bold text-white mb-2">FenceSim</h1>
+              <p className="text-amber-300 text-xl font-medium">College Fencing Manager</p>
+            </div>
+          </div>
+          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+            Welcome to the ultimate college fencing management experience. Build your program, recruit elite athletes, and lead your team to championship glory.
+          </p>
+        </div>
+
+        {/* Step 1: University Selection */}
+        {step === 1 && (
+          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
+            <CardHeader className="text-center border-b border-slate-200">
+              <CardTitle className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-3">
+                <Building className="w-8 h-8 text-amber-600" />
+                Choose Your University
+              </CardTitle>
+              <p className="text-slate-600 text-lg mt-2">Select a prestigious institution or create your own</p>
+            </CardHeader>
+            <CardContent className="p-8">
+              {/* Selected University Display */}
+              {selectedUniversity && (
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">{selectedUniversity.name}</h3>
+                      <p className="text-slate-600">"{selectedUniversity.nickname}" • {selectedUniversity.location}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star className="w-4 h-4 text-amber-500" />
+                        <span className="text-sm font-medium text-slate-700">Prestige: {selectedUniversity.prestige}</span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedUniversity(null)}
+                      className="text-slate-600 hover:text-slate-800"
+                    >
+                      Change
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Custom University Display */}
+              {!selectedUniversity && showCustomForm && isCustomUniversityValid && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">{customUniversity.name}</h3>
+                      <p className="text-slate-600">"{customUniversity.nickname}" • {customUniversity.location}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star className="w-4 h-4 text-amber-500" />
+                        <span className="text-sm font-medium text-slate-700">Prestige: {customUniversity.prestige}</span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowCustomForm(false)}
+                      className="text-slate-600 hover:text-slate-800"
+                    >
+                      Hide Form
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Preset Universities - Only show if nothing selected */}
+              {!selectedUniversity && !showCustomForm && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">Elite Programs</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {presetUniversities.map((university) => (
+                      <div
+                        key={university.name}
+                        onClick={() => handleUniversitySelect(university)}
+                        className="p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-amber-300"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold text-slate-900">{university.nickname}</h4>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-amber-500" />
+                            <span className="text-sm font-medium text-slate-700">{university.prestige}</span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-600 mb-1">{university.name}</p>
+                        <p className="text-xs text-slate-500">{university.location}</p>
+                        <div className="mt-2 flex gap-1">
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                            {university.academic_focus}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                            {university.athletic_focus}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom University Option */}
+              {!selectedUniversity && (
+                <div className="border-t border-slate-200 pt-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-slate-900">Create Custom University</h3>
+                    {!showCustomForm && (
+                      <Button 
+                        onClick={() => setShowCustomForm(true)}
+                        variant="outline"
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                      >
+                        Create Custom
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {showCustomForm && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="uniName">University Name</Label>
+                        <Input
+                          id="uniName"
+                          placeholder="Enter university name"
+                          value={customUniversity.name}
+                          onChange={(e) => handleCustomUniversityChange('name', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="nickname">Team Nickname</Label>
+                        <Input
+                          id="nickname"
+                          placeholder="Enter team nickname"
+                          value={customUniversity.nickname}
+                          onChange={(e) => handleCustomUniversityChange('nickname', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="location">Location</Label>
+                        <Input
+                          id="location"
+                          placeholder="City, State"
+                          value={customUniversity.location}
+                          onChange={(e) => handleCustomUniversityChange('location', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="academicFocus">Academic Focus</Label>
+                        <Select value={customUniversity.academic_focus} onValueChange={(val) => handleCustomUniversityChange('academic_focus', val)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="STEM">STEM</SelectItem>
+                            <SelectItem value="Liberal Arts">Liberal Arts</SelectItem>
+                            <SelectItem value="Balanced">Balanced</SelectItem>
+                            <SelectItem value="Fine Arts">Fine Arts</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-end mt-8">
+                <Button
+                  onClick={() => setStep(2)}
+                  disabled={!canProceed}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-8 py-3 text-lg"
+                >
+                  Next: Create Coach
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step 2: Coach Creation */}
+        {step === 2 && (
+          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
+            <CardHeader className="text-center border-b border-slate-200">
+              <CardTitle className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-3">
+                <User className="w-8 h-8 text-amber-600" />
+                Create Your Coach
+              </CardTitle>
+              <p className="text-slate-600 text-lg mt-2">Define your coaching identity and philosophy</p>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="coachName">Coach Name</Label>
+                    <Input
+                      id="coachName"
+                      placeholder="Enter your name"
+                      value={coachData.name}
+                      onChange={(e) => handleCoachChange('name', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="philosophy">Coaching Philosophy</Label>
+                    <Select value={coachData.philosophy} onValueChange={(val) => handleCoachChange('philosophy', val)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Developmental">Developmental - Focus on growing young talent</SelectItem>
+                        <SelectItem value="Recruiting-Heavy">Recruiting-Heavy - Attract top prospects</SelectItem>
+                        <SelectItem value="Tactical-Master">Tactical-Master - Strategic match preparation</SelectItem>
+                        <SelectItem value="Balanced">Balanced - Well-rounded approach</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="specialty">Coaching Specialty</Label>
+                    <Select value={coachData.specialty} onValueChange={(val) => handleCoachChange('specialty', val)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Recruiting">Recruiting - Better at attracting talent</SelectItem>
+                        <SelectItem value="Talent Development">Talent Development - Faster fencer growth</SelectItem>
+                        <SelectItem value="In-Match Tactics">In-Match Tactics - Strategic advantages</SelectItem>
+                        <SelectItem value="Conditioning">Conditioning - Improved fitness training</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-6 rounded-xl">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Your Program Preview</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">University:</span>
+                      <span className="font-medium text-slate-900">
+                        {selectedUniversity?.name || customUniversity.name}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Team:</span>
+                      <span className="font-medium text-slate-900">
+                        {selectedUniversity?.nickname || customUniversity.nickname}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Coach:</span>
+                      <span className="font-medium text-slate-900">{coachData.name || "Name TBD"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Philosophy:</span>
+                      <span className="font-medium text-slate-900">{coachData.philosophy}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Specialty:</span>
+                      <span className="font-medium text-slate-900">{coachData.specialty}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between mt-8">
+                <Button
+                  onClick={() => setStep(1)}
+                  variant="outline"
+                  className="px-6 py-3"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={createProgram}
+                  disabled={!coachData.name || isCreating}
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 px-8 py-3 text-lg"
+                >
+                  {isCreating ? (
+                    <>Creating Program...</>
+                  ) : (
+                    <>
+                      <Trophy className="w-5 h-5 mr-2" />
+                      Start Your Journey
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
