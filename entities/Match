@@ -1,0 +1,74 @@
+{
+  "name": "Match",
+  "type": "object",
+  "properties": {
+    "opponent": {
+      "type": "string",
+      "description": "Opposing team name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Match date"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "dual_meet",
+        "tournament",
+        "regional",
+        "national"
+      ],
+      "description": "Type of competition"
+    },
+    "venue": {
+      "type": "string",
+      "enum": [
+        "home",
+        "away",
+        "neutral"
+      ],
+      "description": "Match location"
+    },
+    "results": {
+      "type": "object",
+      "properties": {
+        "foil_score": {
+          "type": "string"
+        },
+        "epee_score": {
+          "type": "string"
+        },
+        "sabre_score": {
+          "type": "string"
+        },
+        "overall_result": {
+          "type": "string",
+          "enum": [
+            "win",
+            "loss",
+            "tie"
+          ]
+        },
+        "final_score": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "in_progress",
+        "completed"
+      ],
+      "default": "scheduled"
+    }
+  },
+  "required": [
+    "opponent",
+    "date",
+    "type",
+    "venue"
+  ]
+}
