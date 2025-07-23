@@ -1,0 +1,73 @@
+{
+  "name": "TeamStats",
+  "type": "object",
+  "properties": {
+    "season_year": {
+      "type": "string",
+      "description": "Academic year (e.g., 2024-25)"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Total program budget"
+    },
+    "budget_used": {
+      "type": "number",
+      "description": "Budget already spent"
+    },
+    "team_ranking": {
+      "type": "number",
+      "description": "National ranking"
+    },
+    "wins": {
+      "type": "number",
+      "default": 0
+    },
+    "losses": {
+      "type": "number",
+      "default": 0
+    },
+    "facilities": {
+      "type": "object",
+      "properties": {
+        "training_room_level": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "recovery_center_level": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "dorms_level": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        }
+      }
+    },
+    "staff": {
+      "type": "object",
+      "properties": {
+        "head_coach_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "assistant_coaches": {
+          "type": "number"
+        },
+        "trainers": {
+          "type": "number"
+        },
+        "analysts": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "season_year",
+    "budget"
+  ]
+}
