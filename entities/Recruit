@@ -1,0 +1,74 @@
+{
+  "name": "Recruit",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name of the recruit"
+    },
+    "high_school": {
+      "type": "string",
+      "description": "High school or previous institution"
+    },
+    "weapon": {
+      "type": "string",
+      "enum": [
+        "foil",
+        "epee",
+        "sabre"
+      ],
+      "description": "Primary weapon"
+    },
+    "rating": {
+      "type": "string",
+      "enum": [
+        "5-star",
+        "4-star",
+        "3-star",
+        "2-star",
+        "1-star"
+      ],
+      "description": "Recruiting rating"
+    },
+    "academic_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Academic aptitude score"
+    },
+    "interest_level": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Interest in our program"
+    },
+    "competing_schools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Other schools recruiting this athlete"
+    },
+    "visit_scheduled": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "interested",
+        "visited",
+        "offered",
+        "committed",
+        "signed"
+      ],
+      "default": "interested"
+    }
+  },
+  "required": [
+    "name",
+    "high_school",
+    "weapon",
+    "rating"
+  ]
+}
