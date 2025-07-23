@@ -1,0 +1,136 @@
+{
+  "name": "Fencer",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name of the fencer"
+    },
+    "age": {
+      "type": "number",
+      "description": "Age of the fencer"
+    },
+    "year": {
+      "type": "string",
+      "enum": [
+        "Freshman",
+        "Sophomore",
+        "Junior",
+        "Senior",
+        "Graduate"
+      ],
+      "description": "Academic year"
+    },
+    "weapon": {
+      "type": "string",
+      "enum": [
+        "foil",
+        "epee",
+        "sabre"
+      ],
+      "description": "Primary weapon specialty"
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "technique": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "endurance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "mental_focus": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tactical_awareness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "personality": {
+      "type": "string",
+      "enum": [
+        "leader",
+        "clutch_performer",
+        "emotional",
+        "analytical",
+        "aggressive",
+        "defensive"
+      ],
+      "description": "Primary personality trait"
+    },
+    "academic_gpa": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4,
+      "description": "Current GPA"
+    },
+    "injuries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "minor",
+              "moderate",
+              "severe"
+            ]
+          },
+          "recovery_weeks": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "fatigue_level": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Current fatigue (0 = fresh, 100 = exhausted)"
+    },
+    "morale": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Current morale level"
+    },
+    "wins": {
+      "type": "number",
+      "default": 0
+    },
+    "losses": {
+      "type": "number",
+      "default": 0
+    },
+    "potential": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Growth potential ceiling"
+    }
+  },
+  "required": [
+    "name",
+    "age",
+    "year",
+    "weapon"
+  ]
+}
